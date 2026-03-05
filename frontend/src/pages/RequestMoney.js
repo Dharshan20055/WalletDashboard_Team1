@@ -36,8 +36,13 @@ export default function RequestMoney() {
         setLoading(true);
         setError('');
         setSuccess('');
+        if (!currentUser?.id) {
+            setError('Your session has expired. Please login again.');
+            setTimeout(() => navigate('/login'), 2000);
+            return;
+        }
         try {
-            await requestAddMoney({ userId: currentUser?.id, amount: Number(amount) });
+            await requestAddMoney({ userId: currentUser.id, amount: Number(amount) });
             setSuccess(`✅ Request for ₹${amount} sent to Admin!`);
             setAmount('');
             loadMyRequests();

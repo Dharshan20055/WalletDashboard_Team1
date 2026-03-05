@@ -58,6 +58,7 @@ export default function Home() {
 
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('wallet_auth');
             navigate('/login');
         }
     };
