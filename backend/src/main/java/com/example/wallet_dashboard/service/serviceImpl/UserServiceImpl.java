@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword()); // plain text for hackathon demo
+        user.setPassword(request.getPassword()); 
         user.setRole(request.getRole() != null ? request.getRole().toUpperCase() : "USER");
         user.setWalletBalance(0.0);
         user.setFrozen(false);
