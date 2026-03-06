@@ -29,9 +29,7 @@ export default function SignUp() {
             window.alert(`📩 Sign Up OTP: ${MOCK_OTP}`);
             navigate('/otp-verify');
         } catch (err) {
-            setAuthState(prev => ({ ...prev, email: form.email, password: form.password, isSignedUp: true }));
-            window.alert(`📩 Sign Up OTP: ${MOCK_OTP}`);
-            navigate('/otp-verify');
+            setError(err.message || 'Registration failed. Please try again.');
         }
     };
 

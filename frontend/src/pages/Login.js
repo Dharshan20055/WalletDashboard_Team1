@@ -39,20 +39,14 @@ export default function Login() {
             setAuthState(prev => ({ ...prev, email: form.email, currentUser: user }));
 
             if (user.role === 'ADMIN') {
+                setAuthState(prev => ({ ...prev, isLoggedIn: true }));
                 navigate('/admin');
             } else {
                 window.alert(`🔐 Login OTP: ${MOCK_OTP}`);
                 navigate('/login-otp');
             }
         } catch (err) {
-            if (authState.email && form.email === authState.email && form.password === authState.password) {
-                const mockUser = { id: 1, name: 'User', email: form.email, role: 'USER', walletBalance: 100 };
-                setAuthState(prev => ({ ...prev, currentUser: mockUser }));
-                window.alert(`🔐 Login OTP: ${MOCK_OTP}`);
-                navigate('/login-otp');
-            } else {
-                setError(err.message || 'Invalid credentials');
-            }
+            setError(err.message || 'Invalid credentials');
         } finally {
             setLoading(false);
         }
