@@ -29,7 +29,7 @@ public class Transaction {
 
     private String description;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();   //transfer time
 
     @PrePersist
     protected void onCreate() {
