@@ -118,7 +118,21 @@ function AccountDetailsModal({ onClose }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (step === 1) {
-            if (!form.firstName || !form.lastName || !form.phone) return setError('Fill required fields.');
+            if (!form.firstName || !form.lastName || !form.phone || !form.dob) return setError('Fill required fields.');
+
+            // Age validation
+            const birthDate = new Date(form.dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            if (age < 18) {
+                return setError('18+ years required. Child is not allowed.');
+            }
+
             setStep(2); return;
         }
         if (!form.address || !form.pin) return setError('Address & PIN required.');
@@ -155,7 +169,7 @@ function AccountDetailsModal({ onClose }) {
                             </div>
                             <div className="form-group"><label>Phone Number*</label><input name="phone" value={form.phone} onChange={handleChange} /></div>
                             <div className="grid-2">
-                                <div className="form-group"><label>Date of Birth</label><input type="date" name="dob" value={form.dob} onChange={handleChange} /></div>
+                                <div className="form-group"><label>Date of Birth</label><input type="date" name="dob" maxLength={10} value={form.dob} onChange={handleChange} /></div>
                                 <div className="form-group"><label>Gender</label>
                                     <select name="gender" value={form.gender} onChange={handleChange}><option value="">Select</option><option>Male</option><option>Female</option></select>
                                 </div>

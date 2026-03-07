@@ -7,8 +7,13 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import SendMoney from './pages/SendMoney';
 import TransactionHistory from './pages/TransactionHistory';
-import AdminDashboard from './pages/AdminDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminRequests from './pages/admin/AdminRequests';
+import AdminHistory from './pages/admin/AdminHistory';
+import AdminLayout from './components/AdminLayout';
 import RequestMoney from './pages/RequestMoney';
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
 
 
 // Auth Context — shared across the app
@@ -38,20 +43,47 @@ function App() {
     localStorage.setItem('wallet_auth', JSON.stringify(authState));
   }, [authState]);
 
+  // Sync session across tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'wallet_auth') {
+        const newValue = e.newValue ? JSON.parse(e.newValue) : null;
+        if (newValue) {
+          setAuthState(newValue);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   return (
     <AuthContext.Provider value={{ authState, setAuthState, MOCK_OTP }}>
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/signup" element={<SignUp />} />
+
+          {/* Public Routes */}
+          <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} />
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/otp-verify" element={<OTPVerification />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/login-otp" element={<OTPVerification isLoginFlow />} />
-          <Route path="/home" element={authState.currentUser ? <Home /> : <Navigate to="/login" />} />
-          <Route path="/send" element={authState.currentUser ? <SendMoney /> : <Navigate to="/login" />} />
-          <Route path="/request" element={authState.currentUser ? <RequestMoney /> : <Navigate to="/login" />} />
-          <Route path="/history" element={authState.currentUser ? <TransactionHistory /> : <Navigate to="/login" />} />
-          <Route path="/admin" element={authState.currentUser?.role === 'ADMIN' ? <AdminDashboard /> : <Navigate to="/login" />} />
+
+          {/* Protected Routes */}
+          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/send" element={<ProtectedRoute><SendMoney /></ProtectedRoute>} />
+          <Route path="/request" element={<ProtectedRoute><RequestMoney /></ProtectedRoute>} />
+          <Route path="/history" element={<ProtectedRoute><TransactionHistory /></ProtectedRoute>} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<ProtectedRoute adminOnly><AdminLayout /></ProtectedRoute>}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="requests" element={<AdminRequests />} />
+            <Route path="history" element={<AdminHistory />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>

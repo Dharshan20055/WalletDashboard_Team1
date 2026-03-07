@@ -12,7 +12,7 @@ const quickActions = [
 
 export default function Home() {
     const navigate = useNavigate();
-    const { authState } = useAuth();
+    const { authState, setAuthState } = useAuth();
     const currentUser = authState.currentUser;
 
     const [balance, setBalance] = useState(currentUser?.walletBalance || 100);
@@ -24,7 +24,7 @@ export default function Home() {
     const initials = displayName?.slice(0, 2).toUpperCase() || 'U';
 
     useEffect(() => {
-        if (!currentUser?.id) return;
+        if (currentUser?.id === undefined || currentUser?.id === null) return;
         getBalance(currentUser.id)
             .then(r => setBalance(r.balance))
             .catch(() => { });
@@ -58,6 +58,15 @@ export default function Home() {
 
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to logout?')) {
+            setAuthState({
+                email: '',
+                password: '',
+                otp: authState.MOCK_OTP || '123456',
+                isSignedUp: false,
+                isLoggedIn: false,
+                currentUser: null,
+                accountDetails: null,
+            });
             localStorage.removeItem('wallet_auth');
             navigate('/login');
         }
@@ -84,16 +93,15 @@ export default function Home() {
                 </div>
 
                 {/* Balance Card Section */}
-                <div className="balance-card" onClick={() => setShowBalance(v => !v)} style={{ cursor: 'pointer' }}>
-                    <div className="balance-label">Total Balance {showBalance ? '👁️' : '🙈'}</div>
-                    <div className="balance-amount">
-                        <span className="balance-currency">₹</span>
-                        {showBalance ? balance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) : '••••••'}
+                {currentUser?.role !== 'ADMIN' && (
+                    <div className="balance-card" onClick={() => setShowBalance(v => !v)} style={{ cursor: 'pointer' }}>
+                        <div className="balance-label">Total Balance {showBalance ? '👁️' : '🙈'}</div>
+                        <div className="balance-amount">
+                            <span className="balance-currency">₹</span>
+                            {showBalance ? balance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) : '••••••'}
+                        </div>
                     </div>
-                    <div className="balance-change">
-                        Initial balance: ₹100.00
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* Main Options */}
