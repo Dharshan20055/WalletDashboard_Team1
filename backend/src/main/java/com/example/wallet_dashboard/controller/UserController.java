@@ -50,4 +50,7 @@ public class UserController {
         return ResponseEntity.ok(userService.unfreezeUser(userId));
     }
 }
+<<<<<<< HEAD
 usercontroler
+=======
+>>>>>>> 4003e6746f0c54d38c5c8546ab1a18f3184b75af
